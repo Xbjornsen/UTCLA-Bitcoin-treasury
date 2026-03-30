@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UTCLA Bitcoin Treasury</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Source+Sans+3:wght@300;400;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --orange:   #E6963A;
+      --orange-dark: #A35C16;
+      --bg:       #0f0a04;
+      --bg2:      #1a1008;
+      --bg3:      #241608;
+      --cream:    #F5EDD8;
+      --muted:    #9e8c74;
+      --border:   rgba(230,150,58,0.2);
+    }
+
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--cream);
+      font-family: 'Source Sans 3', 'Segoe UI', sans-serif;
+      overflow: hidden;
+    }
+
+    /* ── SLIDE CONTAINER ── */
+    #deck {
+      width: 100vw;
+      height: 100vh;
+      position: relative;
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 5vw 8vw;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.6s ease;
+      text-align: center;
+    }
+
+    .slide.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    /* ── TYPOGRAPHY ── */
+    h1 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: clamp(2rem, 5vw, 4rem);
+      font-weight: 700;
+      line-height: 1.15;
+      color: #fff;
+      margin-bottom: 0.5em;
+    }
+
+    h2 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: clamp(1.6rem, 3.5vw, 2.8rem);
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 0.6em;
+      line-height: 1.2;
+    }
+
+    h3 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: clamp(1.1rem, 2vw, 1.6rem);
+      color: var(--orange);
+      font-weight: 400;
+      font-style: italic;
+      margin-bottom: 1.5em;
+      letter-spacing: 0.02em;
+    }
+
+    p {
+      font-size: clamp(0.95rem, 1.6vw, 1.2rem);
+      color: var(--cream);
+      line-height: 1.7;
+      max-width: 800px;
+      opacity: 0.9;
+    }
+
+    .accent { color: var(--orange); }
+    .dim    { color: var(--muted); font-size: 0.85em; }
+
+    /* ── DECORATIVE LINE ── */
+    .rule {
+      width: 60px;
+      height: 2px;
+      background: var(--orange);
+      margin: 0 auto 1.5em;
+      border-radius: 2px;
+    }
+
+    /* ── CARDS / GRID ── */
+    .cards {
+      display: flex;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 1.5rem;
+      width: 100%;
+      max-width: 900px;
+    }
+
+    .card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.4rem 1.6rem;
+      flex: 1 1 220px;
+      text-align: left;
+    }
+
+    .card-icon {
+      font-size: 1.8rem;
+      margin-bottom: 0.6rem;
+      display: block;
+    }
+
+    .card h4 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1.1rem;
+      color: var(--orange);
+      margin-bottom: 0.4rem;
+    }
+
+    .card p {
+      font-size: 0.9rem;
+      opacity: 0.8;
+    }
+
+    /* ── FLOW DIAGRAM ── */
+    .flow {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 2rem;
+    }
+
+    .flow-box {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem 1.4rem;
+      text-align: center;
+      min-width: 130px;
+    }
+
+    .flow-box .label {
+      font-size: 0.75rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 0.3rem;
+    }
+
+    .flow-box .value {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1rem;
+      color: #fff;
+    }
+
+    .flow-arrow {
+      color: var(--orange);
+      font-size: 1.5rem;
+      flex-shrink: 0;
+    }
+
+    /* ── STEPS ── */
+    .steps {
+      list-style: none;
+      text-align: left;
+      max-width: 680px;
+      width: 100%;
+      margin-top: 1.5rem;
+    }
+
+    .steps li {
+      display: flex;
+      gap: 1.2rem;
+      align-items: flex-start;
+      padding: 0.8rem 0;
+      border-bottom: 1px solid rgba(230,150,58,0.1);
+      font-size: clamp(0.9rem, 1.4vw, 1.05rem);
+    }
+
+    .steps li:last-child { border-bottom: none; }
+
+    .step-num {
+      background: var(--orange);
+      color: var(--bg);
+      font-weight: 700;
+      font-size: 0.8rem;
+      min-width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 0.1rem;
+      flex-shrink: 0;
+    }
+
+    /* ── QUOTE ── */
+    .blockquote {
+      border-left: 3px solid var(--orange);
+      padding-left: 1.5rem;
+      margin: 1.5rem auto;
+      text-align: left;
+      max-width: 700px;
+    }
+
+    .blockquote p {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-style: italic;
+      font-size: clamp(1rem, 1.8vw, 1.3rem);
+      color: #fff;
+      opacity: 1;
+    }
+
+    .blockquote cite {
+      display: block;
+      margin-top: 0.6rem;
+      font-size: 0.85rem;
+      color: var(--orange);
+      font-style: normal;
+    }
+
+    /* ── PILL TAGS ── */
+    .tags {
+      display: flex;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 1.2rem;
+    }
+
+    .tag {
+      background: rgba(230,150,58,0.12);
+      border: 1px solid rgba(230,150,58,0.3);
+      color: var(--orange);
+      font-size: 0.8rem;
+      padding: 0.3rem 0.9rem;
+      border-radius: 999px;
+      letter-spacing: 0.04em;
+    }
+
+    /* ── TWO-COL ── */
+    .two-col {
+      display: flex;
+      gap: 3rem;
+      max-width: 900px;
+      width: 100%;
+      margin-top: 1.5rem;
+      text-align: left;
+    }
+
+    .two-col > div { flex: 1; }
+
+    .two-col h4 {
+      font-family: 'Playfair Display', Georgia, serif;
+      color: var(--orange);
+      margin-bottom: 0.6rem;
+      font-size: 1.05rem;
+    }
+
+    .two-col p { font-size: 0.95rem; }
+
+    /* ── BG TEXTURES PER SLIDE ── */
+    #s1 { background: radial-gradient(ellipse at 60% 40%, #2a1a08 0%, #0f0a04 70%); }
+    #s2 { background: radial-gradient(ellipse at 30% 60%, #1a0a0a 0%, #0f0a04 70%); }
+    #s3 { background: radial-gradient(ellipse at 70% 30%, #0a100a 0%, #0f0a04 70%); }
+    #s4 { background: radial-gradient(ellipse at 50% 50%, #1a1008 0%, #0f0a04 70%); }
+    #s5 { background: radial-gradient(ellipse at 40% 60%, #0a0a18 0%, #0f0a04 70%); }
+    #s6 { background: radial-gradient(ellipse at 60% 40%, #1a1008 0%, #0f0a04 70%); }
+    #s7 { background: radial-gradient(ellipse at 30% 40%, #0f1008 0%, #0f0a04 70%); }
+    #s8 { background: radial-gradient(ellipse at 60% 60%, #0a1214 0%, #0f0a04 70%); }
+    #s9 { background: radial-gradient(ellipse at 50% 40%, #2a1a08 0%, #0f0a04 70%); }
+
+    /* ── PROGRESS BAR ── */
+    #progress-bar {
+      position: fixed;
+      top: 0; left: 0;
+      height: 3px;
+      background: var(--orange);
+      transition: width 0.4s ease;
+      z-index: 100;
+    }
+
+    /* ── NAV CONTROLS ── */
+    #nav {
+      position: fixed;
+      bottom: 1.8rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      z-index: 100;
+    }
+
+    .nav-btn {
+      background: rgba(230,150,58,0.1);
+      border: 1px solid rgba(230,150,58,0.3);
+      color: var(--orange);
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+    }
+
+    .nav-btn:hover { background: rgba(230,150,58,0.25); }
+
+    #slide-counter {
+      font-size: 0.8rem;
+      color: var(--muted);
+      min-width: 60px;
+      text-align: center;
+      letter-spacing: 0.05em;
+    }
+
+
+    /* ── LOGO ── */
+    .logo-mark {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 0.85rem;
+      letter-spacing: 0.15em;
+      color: var(--orange);
+      position: fixed;
+      top: 1.2rem;
+      left: 1.8rem;
+      z-index: 100;
+      opacity: 0.7;
+    }
+
+    /* ── LARGE ICON SLIDES ── */
+    .big-icon {
+      font-size: clamp(3rem, 6vw, 5rem);
+      margin-bottom: 0.5rem;
+    }
+
+    /* ── BITCOIN SYMBOL ── */
+    .btc {
+      display: inline-block;
+      color: var(--orange);
+    }
+
+    @media (max-width: 600px) {
+      .two-col { flex-direction: column; gap: 1.5rem; }
+      .flow { gap: 0.4rem; }
+      .flow-arrow { font-size: 1rem; }
+      .cards { gap: 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="logo-mark">UTCLA</div>
+<div id="progress-bar"></div>
+
+<!-- ════════════════════════════════════════════
+     SLIDES
+════════════════════════════════════════════ -->
+<div id="deck">
+
+  <!-- SLIDE 1: TITLE -->
+  <div class="slide active" id="s1" data-notes="Welcome everyone. Today I want to walk you through something we believe is a significant milestone for UTCLA — the establishment of a sovereign Bitcoin Treasury. This is about ensuring that the value of Country flows back to Country. No banks, no intermediaries, no government gatekeepers. Just direct, sovereign control of resources and revenue. We're here for awareness and to begin a conversation about endorsement.">
+    <div class="big-icon">🪨</div>
+    <h1>UTCLA <span class="accent">Bitcoin</span> Treasury</h1>
+    <div class="rule"></div>
+    <h3>Sound money for sovereign Nations</h3>
+    <p>A framework for economic self-determination across UTCLA member Nations — grounded in Tjukurpa, governed by Council.</p>
+    <div class="tags" style="margin-top:2rem;">
+      <span class="tag">United Tribal Countries Land Alliance</span>
+      <span class="tag">Sovereign Treasury</span>
+      <span class="tag">Bitcoin</span>
+    </div>
+  </div>
+
+  <!-- SLIDE 2: THE PROBLEM -->
+  <div class="slide" id="s2" data-notes="Before we talk about the solution, let's be honest about the problem. Every time UTCLA or its member Nations receive payments in Australian dollars, that money has to pass through banks. Banks can freeze accounts. Governments can redirect or quarantine funds. Intermediaries like lawyers, accountants, and agencies all take a slice. This isn't hypothetical — income management schemes, cashless welfare cards, and land council structures have historically siphoned value away from communities. The problem isn't the people. The problem is the system we're forced to use.">
+    <h2>The <span class="accent">Problem</span></h2>
+    <div class="rule"></div>
+    <h3>Fiat money and Aboriginal sovereignty don't mix</h3>
+    <div class="cards">
+      <div class="card">
+        <span class="card-icon">🏦</span>
+        <h4>Banks Can Freeze</h4>
+        <p>Any account holding Nation funds can be frozen, blocked, or monitored by third parties without consent.</p>
+      </div>
+      <div class="card">
+        <span class="card-icon">🏛️</span>
+        <h4>Governments Can Redirect</h4>
+        <p>Federal and state bodies have historically redirected, quarantined, or controlled Aboriginal funding flows.</p>
+      </div>
+      <div class="card">
+        <span class="card-icon">🔗</span>
+        <h4>Intermediaries Extract</h4>
+        <p>Land councils, agencies, and administrators extract value before it ever reaches communities on Country.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 3: BITCOIN FIRST PRINCIPLES -->
+  <div class="slide" id="s3" data-notes="Now — for our elders in the room, I want to explain Bitcoin simply. Bitcoin is often described as digital money. But for UTCLA, we prefer to think of it differently. Imagine a piece of Country that exists in digital form. It cannot be taken. It cannot be frozen. It does not need a bank to exist. The record of who owns it is kept not by any one government or institution, but across thousands of computers around the world simultaneously — much like how Tjukurpa is held collectively by the people, not in any one book or by any one authority. No single person or government can alter it. And critically — you can send it anywhere in the world, instantly, to another Nation, another community, another project — with no intermediary needed.">
+    <h2>Bitcoin — <span class="accent">First Principles</span></h2>
+    <div class="rule"></div>
+    <h3>Explained through the lens of Country</h3>
+    <div class="two-col">
+      <div>
+        <div class="blockquote">
+          <p>"Imagine Country that exists in digital form — it cannot be seized, it cannot be frozen, and it requires no bank to hold it."</p>
+        </div>
+        <p style="margin-top:1rem;">Bitcoin is a global, open ledger. No single government, bank, or institution controls it. Like Tjukurpa — it is held collectively, immutably, by everyone.</p>
+      </div>
+      <div>
+        <div class="card" style="margin-bottom:1rem;">
+          <h4>🔒 No One Can Freeze It</h4>
+          <p>Your Bitcoin is yours alone. No bank account. No third-party permission needed.</p>
+        </div>
+        <div class="card" style="margin-bottom:1rem;">
+          <h4>🌏 Send Anywhere, Instantly</h4>
+          <p>From UTCLA to another Nation, another project — direct, with no intermediary and near-zero fees.</p>
+        </div>
+        <div class="card">
+          <h4>📖 The Record is Permanent</h4>
+          <p>Every transaction is recorded forever on the Bitcoin ledger — transparent, verifiable, immutable.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 4: THE MODEL -->
+  <div class="slide" id="s4" data-notes="Here's the core model in simple terms. Mining companies and resource partners operate on UTCLA Country. Instead of paying in Australian dollars — which must pass through banks and institutions — they pay directly in Bitcoin to a UTCLA-controlled wallet. That Bitcoin sits in the UTCLA Treasury. From there, the Council authorises distributions — to member Nations, to community projects, to new initiatives. The key word is 'directly.' No bank in the middle. No government agency. UTCLA controls it end to end.">
+    <h2>The <span class="accent">Model</span></h2>
+    <div class="rule"></div>
+    <h3>Resource access payments flow directly to sovereign treasury</h3>
+    <div class="flow">
+      <div class="flow-box">
+        <div class="label">Resource Partners</div>
+        <div class="value">⛏️ Mining Co.</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box" style="border-color:var(--orange);">
+        <div class="label">Payment in</div>
+        <div class="value"><span class="accent">₿ Bitcoin</span></div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box">
+        <div class="label">UTCLA</div>
+        <div class="value">🏛️ Treasury</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box">
+        <div class="label">Council Distributes To</div>
+        <div class="value">🌿 Nations &amp; Projects</div>
+      </div>
+    </div>
+    <div class="tags" style="margin-top:2rem;">
+      <span class="tag">No banks</span>
+      <span class="tag">No intermediaries</span>
+      <span class="tag">No government gatekeeping</span>
+      <span class="tag">Direct sovereignty</span>
+    </div>
+  </div>
+
+  <!-- SLIDE 5: VULTISIG -->
+  <div class="slide" id="s5" data-notes="Now — the critical question for elders is: who controls the Bitcoin? The answer is: the Council does. Collectively. We are using a system called Vultisig — a multi-signature wallet. Think of it like a safe that requires multiple keys to open. No single council member can move funds alone. A threshold — say, 3 out of 5 Council members — must all agree and sign off before any Bitcoin can move. This is not just a security feature — it is a technological expression of how UTCLA already governs. Collective authority. No single point of failure. No one person who can be pressured or compromised.">
+    <h2>Vultisig — <span class="accent">Council-Governed</span> Custody</h2>
+    <div class="rule"></div>
+    <h3>Technology that mirrors Tjukurpa governance</h3>
+    <div class="cards">
+      <div class="card">
+        <span class="card-icon">🔑</span>
+        <h4>Multi-Signature</h4>
+        <p>Multiple Council members must sign before any Bitcoin can move. No single person holds the key.</p>
+      </div>
+      <div class="card">
+        <span class="card-icon">🛡️</span>
+        <h4>No Seed Phrase Risk</h4>
+        <p>Vultisig uses threshold signature technology — there is no single seed phrase that can be stolen or lost.</p>
+      </div>
+      <div class="card">
+        <span class="card-icon">🤝</span>
+        <h4>Mirrors Council Law</h4>
+        <p>Collective decision-making is encoded into the technology itself. Sovereignty is built in.</p>
+      </div>
+      <div class="card">
+        <span class="card-icon">📱</span>
+        <h4>Simple Interface</h4>
+        <p>Vultisig is a mobile app. Council members approve transactions from their devices wherever they are on Country.</p>
+      </div>
+    </div>
+    <p style="margin-top:1.5rem;" class="dim">Powered by <a href="https://vultisig.com" style="color:var(--orange); text-decoration:none;">vultisig.com</a> — open source, non-custodial, no third-party control</p>
+  </div>
+
+  <!-- SLIDE 6: HOW IT WORKS -->
+  <div class="slide" id="s6" data-notes="Let's walk through exactly how a payment works, step by step. Step one — a resource access agreement is signed between the mining company and UTCLA. Embedded in that agreement is a clause: payment must be made in Bitcoin. Step two — UTCLA generates a Bitcoin wallet address. Think of it like a bank account number, but controlled only by the Council. Step three — the mining company sends the agreed Bitcoin amount directly to that address. Step four — the Bitcoin arrives in the Vultisig treasury, where it is held collectively by the Council. Step five — the Council meets, and by collective signature, authorises any distributions for projects, member Nations, or operational costs.">
+    <h2>How It <span class="accent">Works</span></h2>
+    <div class="rule"></div>
+    <h3>From agreement to treasury — five steps</h3>
+    <ol class="steps">
+      <li>
+        <span class="step-num">1</span>
+        <div><strong>Resource Agreement Signed</strong> — Mining company and UTCLA agree on terms. Payment clause specifies Bitcoin only.</div>
+      </li>
+      <li>
+        <span class="step-num">2</span>
+        <div><strong>UTCLA Issues a Bitcoin Address</strong> — A unique wallet address is generated. Only the Council can spend from it.</div>
+      </li>
+      <li>
+        <span class="step-num">3</span>
+        <div><strong>Mining Company Sends Bitcoin</strong> — Direct on-chain transfer. No bank. No wire transfer. No intermediary.</div>
+      </li>
+      <li>
+        <span class="step-num">4</span>
+        <div><strong>Funds Held in Vultisig Treasury</strong> — Bitcoin arrives and is secured in the multi-signature Council wallet.</div>
+      </li>
+      <li>
+        <span class="step-num">5</span>
+        <div><strong>Council Authorises Distributions</strong> — By collective signature, funds flow to Nations, communities, and approved projects.</div>
+      </li>
+    </ol>
+  </div>
+
+  <!-- SLIDE 7: DISTRIBUTION -->
+  <div class="slide" id="s7" data-notes="The question of how Bitcoin is distributed from the treasury to member Nations and projects is one the Council will determine. We are proposing the establishment of a Special Distribution Council — a sub-group of the Men's and Women's Councils — who will have visibility over the treasury and will approve disbursements according to agreed priorities. This governance layer is still being designed collaboratively with UTCLA leadership. What is certain: every transaction on Bitcoin is permanently recorded on the public ledger. This means full transparency — any member Nation can verify that funds were sent, when, and in what amount. There is no hidden accounting.">
+    <h2>Distribution — <span class="accent">Council Governed</span></h2>
+    <div class="rule"></div>
+    <h3>From treasury to Nations, communities &amp; projects</h3>
+    <div class="two-col">
+      <div>
+        <h4>Special Distribution Council</h4>
+        <p>A sub-group of the Men's and Women's Councils will govern treasury distributions — approving allocations to member Nations, community projects, and cross-Nation initiatives.</p>
+        <br/>
+        <p class="dim">Governance structure currently being designed in collaboration with UTCLA leadership.</p>
+      </div>
+      <div>
+        <div class="card" style="margin-bottom:1rem;">
+          <h4>🌿 Member Nations</h4>
+          <p>Direct allocations to Pintupi, Ni'ripono, and Majagi Nations based on agreed share.</p>
+        </div>
+        <div class="card" style="margin-bottom:1rem;">
+          <h4>🏗️ Community Projects</h4>
+          <p>Housing, health, education, cultural continuity — funded on-chain, transparently.</p>
+        </div>
+        <div class="card">
+          <h4>🌐 Inter-Nation Initiatives</h4>
+          <p>Support for other Indigenous Nations globally — Bitcoin enables borderless transfers.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 8: PHASE 2 - MINING ON COUNTRY -->
+  <div class="slide" id="s8" data-notes="Looking ahead — there is a second chapter to this story that we believe is transformative. UTCLA Country holds significant energy resources — solar, land, and potentially other clean energy assets. Phase two of the UTCLA Bitcoin strategy is to use that energy to mine Bitcoin directly. What does that mean? Bitcoin miners are essentially computers that run on electricity, competing to validate the Bitcoin ledger in exchange for newly created Bitcoin. If UTCLA can harness the energy of Country — sun, wind, land — and convert it into Bitcoin, they become not just a recipient of payments, but a direct producer of the hardest money on earth. This is the long game. And the foundation we're building today — the treasury, the wallet, the governance — is what makes phase two possible.">
+    <h2>Phase 2 — <span class="accent">Mining on Country</span></h2>
+    <div class="rule"></div>
+    <h3>From sovereign treasury to sovereign Bitcoin production</h3>
+    <div class="flow" style="margin-bottom:1.5rem;">
+      <div class="flow-box">
+        <div class="label">Country</div>
+        <div class="value">☀️ Energy</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box">
+        <div class="label">Powers</div>
+        <div class="value">⚙️ Mining Rigs</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box" style="border-color:var(--orange);">
+        <div class="label">Produces</div>
+        <div class="value"><span class="accent">₿ Bitcoin</span></div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box">
+        <div class="label">Flows To</div>
+        <div class="value">🏛️ Treasury</div>
+      </div>
+    </div>
+    <p>Country has always been the source of life and wealth. Phase 2 ensures that UTCLA Nations capture the full value of their land's energy — not as a royalty, but as direct Bitcoin production owned entirely by the Nations.</p>
+    <div class="tags" style="margin-top:1.5rem;">
+      <span class="tag">Solar Energy</span>
+      <span class="tag">Bitcoin Mining</span>
+      <span class="tag">Sovereign Production</span>
+      <span class="tag">Long-term Wealth</span>
+    </div>
+  </div>
+
+  <!-- SLIDE 9: THE ASK -->
+  <div class="slide" id="s9" data-notes="We are not here today asking for signatures on contracts or asking anyone to commit capital. We are here for awareness and endorsement — to ensure that everyone in this room understands the vision, believes in its integrity, and is willing to move forward in good faith. For our mining and resource partners: we ask that you acknowledge your willingness to include a Bitcoin payment clause in future resource access agreements with UTCLA. For our elders and Council members: we ask for your endorsement of this framework — your blessing that the Bitcoin Treasury model is aligned with UTCLA's values of sovereignty, cultural continuity, and self-determination. Together, we are building something that has never existed before — an Indigenous-governed, Bitcoin-native sovereign treasury. Thank you.">
+    <h2>The <span class="accent">Ask</span></h2>
+    <div class="rule"></div>
+    <h3>Awareness and endorsement — nothing more, nothing less</h3>
+    <div class="two-col" style="margin-top:1.5rem;">
+      <div>
+        <div class="card">
+          <h4>⛏️ For Resource Partners</h4>
+          <p style="margin-bottom:0.8rem;">Acknowledge your willingness to include a <strong style="color:var(--orange);">Bitcoin payment clause</strong> in future resource access agreements with UTCLA.</p>
+          <p class="dim">No commitment today. Awareness and in-principle endorsement.</p>
+        </div>
+      </div>
+      <div>
+        <div class="card">
+          <h4>🌿 For Elders &amp; Council</h4>
+          <p style="margin-bottom:0.8rem;">Endorse the UTCLA Bitcoin Treasury framework as aligned with the Alliance's principles of <strong style="color:var(--orange);">sovereignty, cultural continuity, and self-determination</strong>.</p>
+          <p class="dim">Your blessing for the path forward.</p>
+        </div>
+      </div>
+    </div>
+    <div class="blockquote" style="margin-top:2rem;">
+      <p>"Our ancient Tjukurpa is the governing authority for UTCLA and underpins all aspects of our society, governance, daily lives and self determination."</p>
+      <cite>— UTCLA Vision Statement</cite>
+    </div>
+  </div>
+
+</div><!-- /deck -->
+
+<!-- ── CONTROLS ── -->
+<div id="nav">
+  <button class="nav-btn" id="prev-btn" title="Previous (←)">&#8592;</button>
+  <span id="slide-counter">1 / 9</span>
+  <button class="nav-btn" id="next-btn" title="Next (→)">&#8594;</button>
+</div>
+
+
+<!-- ── SCRIPT ── -->
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const progressBar = document.getElementById('progress-bar');
+  const counter = document.getElementById('slide-counter');
+  let current = 0;
+
+  function goTo(n) {
+    slides[current].classList.remove('active');
+    current = Math.max(0, Math.min(n, slides.length - 1));
+    slides[current].classList.add('active');
+    const pct = ((current + 1) / slides.length) * 100;
+    progressBar.style.width = pct + '%';
+    counter.textContent = (current + 1) + ' / ' + slides.length;
+  }
+
+  document.getElementById('next-btn').addEventListener('click', () => goTo(current + 1));
+  document.getElementById('prev-btn').addEventListener('click', () => goTo(current - 1));
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); goTo(current + 1); }
+    if (e.key === 'ArrowLeft')                  { e.preventDefault(); goTo(current - 1); }
+  });
+
+  // Touch swipe
+  let touchX = null;
+  document.addEventListener('touchstart', e => { touchX = e.touches[0].clientX; });
+  document.addEventListener('touchend', e => {
+    if (touchX === null) return;
+    const dx = e.changedTouches[0].clientX - touchX;
+    if (Math.abs(dx) > 50) goTo(current + (dx < 0 ? 1 : -1));
+    touchX = null;
+  });
+
+  // Init
+  goTo(0);
+</script>
+
+</body>
+</html>
